@@ -17,27 +17,37 @@
         const commentForm = document.getElementById('commentForm');
         const commentsList = document.getElementById('commentsList');
 
-        commentForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const comment = document.getElementById('comment').value;
-
-            // Store the comment using local storage (for demonstration purposes)
-            let comments = JSON.parse(localStorage.getItem('comments')) || [];
-            comments.push(comment);
-            localStorage.setItem('comments', JSON.stringify(comments));
-
-            // Refresh the comment list
-            displayComments();
-            commentForm.reset();
-        });
-
-        const displayComments = () => {
+        // Function to load comments from local storage
+        const loadComments = () => {
             let comments = JSON.parse(localStorage.getItem('comments')) || [];
             commentsList.innerHTML = comments.map(comment => `<p>${comment}</p>`).join('');
         };
 
+        // Function to add a comment
+        const addComment = (comment) => {
+            let comments = JSON.parse(localStorage.getItem('comments')) || [];
+            comments.push(comment);
+            localStorage.setItem('comments', JSON.stringify(comments));
+            loadComments();
+        };
+
+        // Event listener for form submission
+        commentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const comment = document.getElementById('comment').value;
+            addComment(comment);
+            commentForm.reset();
+        });
+
+        // Check if there is a comment in the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlComment = urlParams.get('comment');
+        if (urlComment) {
+            addComment(decodeURIComponent(urlComment));
+        }
+
         // Load comments on page load
-        displayComments();
+        loadComments();
     </script>
 </body>
 </html>
